@@ -1,12 +1,13 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 
 import { VerificationFormData } from "@shared/types/form";
 
-import { CountrySkeleton } from "@components/LoadingStates/CountrySkeleton";
+import { FieldSkeleton } from "@components/LoadingStates/FieldSkeleton";
 import { loadRecaptcha } from "@utils/loadRecaptcha";
 import { Spinner } from "@components/Spinner/Spinner";
+import { useUserData } from "@hooks/useUserData";
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const CountrySelect = lazy(() => import("@components/Form/CountrySelect"));
@@ -21,18 +22,19 @@ export const VerificationForm = ({
   token,
 }: VerificationFormProps) => {
   const { t } = useTranslation();
+  const userData = useUserData();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<VerificationFormData>();
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    setValue,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<VerificationFormData>({
+    mode: "onChange",
+  });
+  const isFormLoading = userData === null;
 
   const onSubmit = async (data: VerificationFormData) => {
-    setIsSubmitting(true);
-
     try {
       await loadRecaptcha(siteKey);
       await new Promise<void>((resolve) => grecaptcha.ready(resolve));
@@ -47,34 +49,49 @@ export const VerificationForm = ({
     } catch (error) {
       console.error("Captcha error:", error);
       alert("Error with reCAPTCHA, please try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (userData) {
+      setValue("fullname", userData.fullname);
+      setValue("address", userData.address);
+    }
+  }, [userData, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label>{t("fullname")}</label>
-        <input
-          {...register("fullname", { required: true })}
-          className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {userData === null ? (
+          <FieldSkeleton />
+        ) : (
+          <input
+            {...register("fullname", { required: true })}
+            className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        )}
+
         {errors.fullname && (
           <span className="text-red-500">{t("required")}</span>
         )}
       </div>
 
-      <Suspense fallback={<CountrySkeleton />}>
+      <Suspense fallback={<FieldSkeleton />}>
         <CountrySelect register={register} errors={errors} />
       </Suspense>
 
       <div>
         <label>{t("address")}</label>
-        <input
-          {...register("address", { required: true })}
-          className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {userData === null ? (
+          <FieldSkeleton />
+        ) : (
+          <input
+            {...register("address", { required: true })}
+            className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        )}
+
         {errors.address && (
           <span className="text-red-500">{t("required")}</span>
         )}
@@ -82,15 +99,15 @@ export const VerificationForm = ({
       <div className="flex justify-between">
         <button
           type="button"
-          className="border px-4 py-2"
-          disabled={isSubmitting}
+          className="border px-4 py-2 disabled:border-gray-400 disabled:cursor-not-allowed text-gray-600 rounded-lg"
+          disabled
         >
           {t("back")}
         </button>
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-500 text-white px-4 py-2"
+          disabled={isFormLoading || isSubmitting || !isValid}
+          className="bg-blue-500 text-white px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:text-gray-600 rounded-lg cursor-pointer"
         >
           {isSubmitting ? <Spinner /> : t("next")}
         </button>

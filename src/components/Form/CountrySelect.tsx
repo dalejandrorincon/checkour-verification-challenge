@@ -1,7 +1,7 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useCountries } from "@hooks/useCountries";
-import { CountrySkeleton } from "@components/LoadingStates/CountrySkeleton";
+import { FieldSkeleton } from "@components/LoadingStates/FieldSkeleton";
 import { VerificationFormData } from "@shared/types/form";
 import React, { useMemo } from "react";
 import { Country } from "@shared/types/country";
@@ -21,7 +21,7 @@ const CountrySelect = React.memo(({ register, errors }: CountrySelectProps) => {
   }, [mockCountries]);
 
   if (!mockCountries) {
-    return <CountrySkeleton />;
+    return <FieldSkeleton />;
   }
 
   return (
