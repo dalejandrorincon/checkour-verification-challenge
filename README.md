@@ -1,54 +1,66 @@
-# React + TypeScript + Vite
+# POC - Checkout Verification
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 📝 Descripción
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este proyecto es una **prueba de concepto (POC)** que implementa un **flujo de verificación de usuarios**, integrando **reCAPTCHA v3**, manejo de **query params (token, referrer)**, e **internacionalización (i18n)** con soporte para **usuarios con y sin JavaScript habilitado** (fallback `<noscript>`).
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Tecnologías utilizadas
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **React + TypeScript**
+- **Vite** (build rápido y moderno)
+- **TailwindCSS** (utilidades CSS)
+- **react-i18next** (internacionalización)
+- **Google reCAPTCHA v3** (protección contra bots)
+
+---
+
+## 📂 Estructura del proyecto
+
+```plaintext
+checkout-verification/
+├── components/
+│   ├── Form/
+│   ├── Layout/
+│   ├── LoadingStates/
+├── hooks/
+│   ├── useCountries/
+├── locales/
+│   ├── es/
+│   └── pt/
+├── pages/
+│   └── VerificationPage.tsx
+├── shared/
+│   ├── types/
+├── utils/
+│   ├── i18n.ts
+│   └── loadRecaptcha.ts
+├── public/
+│   └── noscript.css  # Estilos del fallback <noscript>
+└── index.html        # Punto de entrada + fallback <noscript>
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Clonar el repositorio
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+git clone https://github.com/dalejandrorincon/checkour-verification-challenge.git
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Instalar dependencias
+
+npm install
+
+## Variables de entorno
+
+cp .env.example .env
+
+## Pruebas de i18n en local
+
+Puedes forzar el idioma manualmente:
+
+VITE_FORCE_LOCALE=pt o es
+
+## Ejecutar en desarrollo
+
+npm run dev
