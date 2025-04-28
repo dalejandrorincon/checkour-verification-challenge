@@ -9,6 +9,10 @@ const ptTranslation = {
   back: "Voltar",
   next: "Próximo",
   loading: "Carregando...",
+  required: "Necessário",
+  selectCountry: "Selecionar país",
+  incorrectCaptcha: "Captcha incorreto",
+  captchaQuestion: "Quanto é 2 + 3?",
 };
 
 export default ptTranslation;

@@ -1,11 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
+import { VerificationForm } from "./components/Form/VerificationForm";
+import { changeLanguage } from "@utils/i18n";
+import { detectLocaleByDomain } from "@utils/detectLocale";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <div>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-    </div>
-  </StrictMode>
-);
+const root = createRoot(document.getElementById("root")!);
+
+(async () => {
+  const detectedLocale = detectLocaleByDomain();
+  await changeLanguage(detectedLocale);
+  root.render(
+    <StrictMode>
+      <VerificationForm />
+    </StrictMode>
+  );
+})();
