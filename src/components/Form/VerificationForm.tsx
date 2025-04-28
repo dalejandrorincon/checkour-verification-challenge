@@ -1,17 +1,17 @@
+import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 
 import { VerificationFormData } from "@shared/types/form";
-import { useCountries } from "@hooks/useCountries";
 
 import { CountrySkeleton } from "@components/LoadingStates/CountrySkeleton";
 import { loadRecaptcha } from "@utils/loadRecaptcha";
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+const CountrySelect = lazy(() => import("@components/Form/CountrySelect"));
 
 export const VerificationForm = () => {
   const { t } = useTranslation();
-  const mockCountries = useCountries();
 
   const {
     register,
@@ -46,32 +46,9 @@ export const VerificationForm = () => {
         )}
       </div>
 
-      <div>
-        <label>{t("country")}</label>
-        {mockCountries === null ? (
-          <CountrySkeleton />
-        ) : (
-          <select
-            aria-label={t("selectCountry")}
-            disabled={mockCountries.length === 0}
-            {...register("country", { required: true })}
-            className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="" hidden>
-              {mockCountries.length === 0 ? t("loading") : t("selectCountry")}
-            </option>
-            {mockCountries.map(({ name, code }) => (
-              <option key={code} value={code}>
-                {name}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {errors.country && (
-          <span className="text-red-500">{t("required")}</span>
-        )}
-      </div>
+      <Suspense fallback={<CountrySkeleton />}>
+        <CountrySelect register={register} errors={errors} />
+      </Suspense>
 
       <div>
         <label>{t("address")}</label>
