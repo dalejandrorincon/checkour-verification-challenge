@@ -10,7 +10,15 @@ import { loadRecaptcha } from "@utils/loadRecaptcha";
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const CountrySelect = lazy(() => import("@components/Form/CountrySelect"));
 
-export const VerificationForm = () => {
+interface VerificationFormProps {
+  referrer?: string | null;
+  token?: string | null;
+}
+
+export const VerificationForm = ({
+  referrer,
+  token,
+}: VerificationFormProps) => {
   const { t } = useTranslation();
 
   const {
@@ -23,8 +31,12 @@ export const VerificationForm = () => {
     try {
       await loadRecaptcha(siteKey);
       await new Promise<void>((resolve) => grecaptcha.ready(resolve));
-      const token = await grecaptcha.execute(siteKey, { action: "submit" });
-      console.log("Captcha token:", token);
+      const tokenCaptcha = await grecaptcha.execute(siteKey, {
+        action: "submit",
+      });
+      console.log("Captcha token:", tokenCaptcha);
+      console.log("Referrer:", referrer);
+      console.log("Token from query:", token);
       console.log("Form submitted:", data);
       alert("Form submitted!");
     } catch (error) {

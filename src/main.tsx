@@ -1,9 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-import { VerificationForm } from "./components/Form/VerificationForm";
 import { changeLanguage } from "@utils/i18n";
 import { detectLocaleByDomain } from "@utils/detectLocale";
+import { VerificationPage } from "@pages/VerificationPage";
+import { BrowserRouter } from "react-router-dom";
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -12,7 +13,9 @@ const root = createRoot(document.getElementById("root")!);
   await changeLanguage(detectedLocale);
   root.render(
     <StrictMode>
-      <VerificationForm />
+      <BrowserRouter>
+        <VerificationPage />
+      </BrowserRouter>
     </StrictMode>
   );
 })();
