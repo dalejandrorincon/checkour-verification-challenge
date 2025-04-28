@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 
@@ -6,6 +6,7 @@ import { VerificationFormData } from "@shared/types/form";
 
 import { CountrySkeleton } from "@components/LoadingStates/CountrySkeleton";
 import { loadRecaptcha } from "@utils/loadRecaptcha";
+import { Spinner } from "@components/Spinner/Spinner";
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const CountrySelect = lazy(() => import("@components/Form/CountrySelect"));
@@ -27,7 +28,11 @@ export const VerificationForm = ({
     formState: { errors },
   } = useForm<VerificationFormData>();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async (data: VerificationFormData) => {
+    setIsSubmitting(true);
+
     try {
       await loadRecaptcha(siteKey);
       await new Promise<void>((resolve) => grecaptcha.ready(resolve));
@@ -42,6 +47,8 @@ export const VerificationForm = ({
     } catch (error) {
       console.error("Captcha error:", error);
       alert("Error with reCAPTCHA, please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,11 +80,19 @@ export const VerificationForm = ({
         )}
       </div>
       <div className="flex justify-between">
-        <button type="button" className="border px-4 py-2">
+        <button
+          type="button"
+          className="border px-4 py-2"
+          disabled={isSubmitting}
+        >
           {t("back")}
         </button>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2">
-          {t("next")}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-blue-500 text-white px-4 py-2"
+        >
+          {isSubmitting ? <Spinner /> : t("next")}
         </button>
       </div>
     </form>
