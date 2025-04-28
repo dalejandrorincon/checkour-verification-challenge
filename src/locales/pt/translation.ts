@@ -11,6 +11,9 @@ const ptTranslation = {
   loading: "Carregando...",
   required: "Necessário",
   selectCountry: "Selecionar país",
+  invalidName: "O nome só pode conter letras e espaços",
+  invalidAddress:
+    "O endereço só pode conter letras, números e caracteres (# - . ,)",
 };
 
 export default ptTranslation;

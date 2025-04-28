@@ -11,6 +11,10 @@ const esTranslation = {
   loading: "Cargando...",
   required: "Requerido",
   selectCountry: "Seleccionar País",
+  minLength: "Debe tener al menos {{count}} caracteres",
+  invalidName: "El nombre solo puede contener letras y espacios",
+  invalidAddress:
+    "La dirección solo puede contener letras, números y caracteres (# - . ,)",
 };
 
 export default esTranslation;

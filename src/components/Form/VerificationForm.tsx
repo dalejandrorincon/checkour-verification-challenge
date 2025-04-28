@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { VerificationFormData } from "@shared/types/form";
 
 import { FieldSkeleton } from "@components/LoadingStates/FieldSkeleton";
-import { loadRecaptcha } from "@utils/loadRecaptcha";
 import { Spinner } from "@components/Spinner/Spinner";
 import { useUserData } from "@hooks/useUserData";
+import { executeRecaptcha } from "@utils/executeRecaptcha";
 
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 const CountrySelect = lazy(() => import("@components/Form/CountrySelect"));
@@ -34,18 +34,17 @@ export const VerificationForm = ({
   });
   const isFormLoading = userData === null;
 
-  const onSubmit = async (data: VerificationFormData) => {
+  const onSubmit = async (formData: VerificationFormData) => {
     try {
-      await loadRecaptcha(siteKey);
-      await new Promise<void>((resolve) => grecaptcha.ready(resolve));
-      const tokenCaptcha = await grecaptcha.execute(siteKey, {
-        action: "submit",
-      });
-      console.log("Captcha token:", tokenCaptcha);
-      console.log("Referrer:", referrer);
-      console.log("Token from query:", token);
-      console.log("Form submitted:", data);
-      alert("Form submitted!");
+      const tokenCaptcha = await executeRecaptcha(siteKey);
+      const payload = {
+        ...formData,
+        captcha: tokenCaptcha,
+        referrer,
+        token,
+      };
+      console.log("Payload enviado al backend:", payload);
+      alert("Formulario enviado");
     } catch (error) {
       console.error("Captcha error:", error);
       alert("Error with reCAPTCHA, please try again.");
@@ -67,13 +66,26 @@ export const VerificationForm = ({
           <FieldSkeleton />
         ) : (
           <input
-            {...register("fullname", { required: true })}
+            {...register("fullname", {
+              required: true,
+              minLength: 3,
+              pattern: {
+                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                message: t("invalidName"),
+              },
+            })}
             className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         )}
 
-        {errors.fullname && (
+        {errors.fullname?.type === "required" && (
           <span className="text-red-500">{t("required")}</span>
+        )}
+        {errors.fullname?.type === "minLength" && (
+          <span className="text-red-500">{t("minLength", { count: 3 })}</span>
+        )}
+        {errors.fullname?.type === "pattern" && (
+          <span className="text-red-500">{t("invalidName")}</span>
         )}
       </div>
 
@@ -87,13 +99,26 @@ export const VerificationForm = ({
           <FieldSkeleton />
         ) : (
           <input
-            {...register("address", { required: true })}
+            {...register("address", {
+              required: true,
+              minLength: 5,
+              pattern: {
+                value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s#\-.,]+$/,
+                message: t("invalidAddress"),
+              },
+            })}
             className="border p-2 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         )}
 
-        {errors.address && (
+        {errors.address?.type === "required" && (
           <span className="text-red-500">{t("required")}</span>
+        )}
+        {errors.address?.type === "minLength" && (
+          <span className="text-red-500">{t("minLength", { count: 5 })}</span>
+        )}
+        {errors.address?.type === "pattern" && (
+          <span className="text-red-500">{t("invalidAddress")}</span>
         )}
       </div>
       <div className="flex justify-between">
