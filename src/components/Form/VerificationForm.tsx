@@ -1,21 +1,36 @@
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+
 import { VerificationFormData } from "@shared/types/form";
 import { useCountries } from "@hooks/useCountries";
+
 import { CountrySkeleton } from "@components/LoadingStates/CountrySkeleton";
+import { loadRecaptcha } from "@utils/loadRecaptcha";
+
+const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 export const VerificationForm = () => {
   const { t } = useTranslation();
   const mockCountries = useCountries();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<VerificationFormData>();
 
-  const onSubmit = (data: VerificationFormData) => {
-    console.log("Form submitted:", data);
-    alert("Form submitted!");
+  const onSubmit = async (data: VerificationFormData) => {
+    try {
+      await loadRecaptcha(siteKey);
+      await new Promise<void>((resolve) => grecaptcha.ready(resolve));
+      const token = await grecaptcha.execute(siteKey, { action: "submit" });
+      console.log("Captcha token:", token);
+      console.log("Form submitted:", data);
+      alert("Form submitted!");
+    } catch (error) {
+      console.error("Captcha error:", error);
+      alert("Error with reCAPTCHA, please try again.");
+    }
   };
 
   return (
@@ -68,21 +83,6 @@ export const VerificationForm = () => {
           <span className="text-red-500">{t("required")}</span>
         )}
       </div>
-
-      <div>
-        <label>{t("captchaQuestion")}</label>
-        <input
-          {...register("captcha", {
-            required: true,
-            validate: (value) => value === "5",
-          })}
-          className="border p-2 w-full"
-        />
-        {errors.captcha && (
-          <span className="text-red-500">{t("incorrectCaptcha")}</span>
-        )}
-      </div>
-
       <div className="flex justify-between">
         <button type="button" className="border px-4 py-2">
           {t("back")}

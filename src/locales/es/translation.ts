@@ -11,8 +11,6 @@ const esTranslation = {
   loading: "Cargando...",
   required: "Requerido",
   selectCountry: "Seleccionar País",
-  incorrectCaptcha: "Captcha incorrecto",
-  captchaQuestion: "¿Cuánto es 2 + 3?",
 };
 
 export default esTranslation;
